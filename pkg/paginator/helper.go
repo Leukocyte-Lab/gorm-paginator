@@ -1,6 +1,7 @@
 package paginator
 
 import (
+	expmgrpb "github.com/Leukocyte-Lab/AGH2-Proto/go/exploitmanager/v1"
 	pb "github.com/Leukocyte-Lab/AGH2-Proto/go/pagination/v1"
 )
 
@@ -37,6 +38,28 @@ func CastPbOrders2Order(pbOrder []*pb.Order) []Order {
 		orders = append(orders, Order{
 			Column:    order.GetColumnName(),
 			Direction: direction,
+		})
+	}
+
+	return orders
+}
+
+func CastPbOrders2ExpmgrPbOrder(pbOrder []*pb.Order) []*expmgrpb.Order {
+	var orders []*expmgrpb.Order
+	for _, order := range pbOrder {
+		var direction expmgrpb.Order_Direction
+		switch order.GetDirection() {
+		case pb.Order_DIRECTION_ASC:
+			direction = expmgrpb.Order_DIRECTION_ASC
+		case pb.Order_DIRECTION_DESC:
+			direction = expmgrpb.Order_DIRECTION_DESC
+		default:
+			continue
+		}
+
+		orders = append(orders, &expmgrpb.Order{
+			ColumnName: order.GetColumnName(),
+			Direction:  direction,
 		})
 	}
 
