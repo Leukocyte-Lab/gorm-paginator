@@ -8,6 +8,7 @@ import (
 	"github.com/kataras/iris/v12"
 	"google.golang.org/protobuf/encoding/protojson"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 func Depaginator(ctx iris.Context) (number int, size int, orders []*pb.Order, err error) {
@@ -94,7 +95,7 @@ func (pgntr Paginator) limit(tx *gorm.DB) *gorm.DB {
 func (pgntr Paginator) orderBy(tx *gorm.DB) *gorm.DB {
 	// concat ORDER SQL query statement by Paginator.order
 	for _, order := range pgntr.Order {
-		tx = tx.Order(fmt.Sprintf("%s %s", order.Column, order.Direction))
+		tx = tx.Order(clause.OrderByColumn{Column: clause.Column{Name: order.Column}, Desc: order.Direction == SortDESC})
 	}
 	return tx
 }
