@@ -1,7 +1,6 @@
 package paginator
 
 import (
-	"fmt"
 	"math"
 
 	pb "github.com/Leukocyte-Lab/AGH2-Proto/go/pagination/v1"
@@ -61,20 +60,13 @@ func (pgntr Paginator) GenGormTransaction(tx *gorm.DB) *gorm.DB {
 }
 
 // CountPageTotal: setter of Paginator.Page.Total
-func (pgntr *Paginator) CountPageTotal(db *gorm.DB, model interface{}) error {
+func (pgntr *Paginator) CountPageTotal(tx *gorm.DB) error {
 	var count int64
-	// count total from database
-	tx := db.Model(model)
-	tx = pgntr.where(tx)
-	err := tx.Count(&count).Error
-	if err != nil {
-		return fmt.Errorf("CountPageTotal: %w", err)
-	}
+	// remove offset and limit before count
+	tx.Offset(-1).Limit(-1).Count(&count)
 	pgntr.Page.Total = int(math.Ceil(float64(count) / float64(pgntr.Page.Size)))
-
 	// limit PageNumber <= PageTotal
 	pgntr.limitPageTotal()
-
 	return nil
 }
 
@@ -115,6 +107,10 @@ func (pgntr *Paginator) limitMinPageSize(minPageSize int) {
 }
 
 func (pgntr *Paginator) limitPageTotal() {
+	// set page total default to 1
+	if pgntr.Page.Total == 0 {
+		pgntr.Page.Total = 1
+	}
 	// limit PageNumber <= PageTotal
 	if pgntr.Page.Number > pgntr.Page.Total {
 		pgntr.Page.Number = pgntr.Page.Total
