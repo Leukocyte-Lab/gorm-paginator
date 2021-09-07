@@ -62,7 +62,8 @@ func (pgntr Paginator) GenGormTransaction(tx *gorm.DB) *gorm.DB {
 // CountPageTotal: setter of Paginator.Page.Total
 func (pgntr *Paginator) CountPageTotal(tx *gorm.DB) error {
 	var count int64
-	// remove offset and limit before count
+	// remove offset, limit and order by before count
+	delete(tx.Statement.Clauses, "ORDER BY")
 	tx.Offset(-1).Limit(-1).Count(&count)
 	pgntr.Page.Total = int(math.Ceil(float64(count) / float64(pgntr.Page.Size)))
 	// limit PageNumber <= PageTotal
