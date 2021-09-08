@@ -67,7 +67,7 @@ func (pgntr *Paginator) CountPageTotal(tx *gorm.DB) error {
 	tx.Offset(-1).Limit(-1).Count(&count)
 	pgntr.Page.Total = int(math.Ceil(float64(count) / float64(pgntr.Page.Size)))
 	// limit PageNumber <= PageTotal
-	pgntr.limitPageTotal()
+	pgntr.LimitPageTotal()
 	return nil
 }
 
@@ -107,7 +107,7 @@ func (pgntr *Paginator) limitMinPageSize(minPageSize int) {
 	}
 }
 
-func (pgntr *Paginator) limitPageTotal() {
+func (pgntr *Paginator) LimitPageTotal() {
 	// set page total default to 1
 	if pgntr.Page.Total == 0 {
 		pgntr.Page.Total = 1
