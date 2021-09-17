@@ -3,32 +3,14 @@ package paginator
 import (
 	"math"
 
-	pb "github.com/Leukocyte-Lab/AGH2-Proto/go/pagination/v1"
-	"github.com/kataras/iris/v12"
-	"google.golang.org/protobuf/encoding/protojson"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
 
-func Depaginator(ctx iris.Context) (number int, size int, orders []*pb.Order, err error) {
-	// querystring /?page={uint}
-	number = ctx.URLParamIntDefault("page", 1)
-
-	// querystring /?size={uint}
-	size = ctx.URLParamIntDefault("size", DefaultPageSize)
-
-	// querystring /?order={"column_name":"{ColumnName}", "direction":"{DIRECTION_ASC || DIRECTION_DESC}"}
-	for _, each := range ctx.Request().URL.Query()["order"] {
-		order := pb.Order{}
-		err = protojson.Unmarshal([]byte(each), &order)
-		if err != nil {
-			return -1, -1, nil, err
-		}
-		orders = append(orders, &order)
-	}
-
-	return number, size, orders, nil
-}
+const (
+	MinPageNumber = 1
+	MinPageSize   = 1
+)
 
 type Paginator struct {
 	Page   Page
