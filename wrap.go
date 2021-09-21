@@ -6,15 +6,16 @@ import (
 	"gorm.io/gorm"
 )
 
-func (pgntr Paginator) Pagging(tx *gorm.DB, dest interface{}) (*Page, error) {
+// Paging : A easy use wrapper for doing paging
+func (pgntr Paginator) Paging(tx *gorm.DB, dest interface{}) (*Page, error) {
 	result := pgntr.GenGormTransaction(tx).Find(&dest)
 	if result.Error != nil {
-		return nil, fmt.Errorf("Paginator.Pagging : %w", result.Error)
+		return nil, fmt.Errorf("paginator.paging : %w", result.Error)
 	}
 
 	err := pgntr.CountPageTotal(result)
 	if err != nil {
-		return nil, fmt.Errorf("Paginator.Pagging : %w", result.Error)
+		return nil, fmt.Errorf("paginator.paging : %w", result.Error)
 	}
 
 	return &pgntr.Page, nil
