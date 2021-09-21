@@ -12,12 +12,14 @@ const (
 	MinPageSize   = 1
 )
 
+// Paginator is basic struct contains pagination information
 type Paginator struct {
 	Page   Page
 	Order  []Order
 	Filter map[string]string
 }
 
+// New is helper function for create Paginator instance
 func New(page Page, orders []Order, filter map[string]string) *Paginator {
 	paginator := Paginator{
 		Page:   page,
@@ -31,7 +33,7 @@ func New(page Page, orders []Order, filter map[string]string) *Paginator {
 	return &paginator
 }
 
-// GenGormTransaction: generate GORMv2 sql Transaction (gorm.DB)
+// GenGormTransaction generate GORMv2 sql Transaction (gorm.DB) for paging
 func (pgntr Paginator) GenGormTransaction(tx *gorm.DB) *gorm.DB {
 	tx = pgntr.offset(tx)
 	tx = pgntr.limit(tx)
@@ -41,7 +43,7 @@ func (pgntr Paginator) GenGormTransaction(tx *gorm.DB) *gorm.DB {
 	return tx
 }
 
-// CountPageTotal: setter of Paginator.Page.Total
+// CountPageTotal is setter of Paginator.Page.Total by counting total page number
 func (pgntr *Paginator) CountPageTotal(tx *gorm.DB) error {
 	var count int64
 	// remove offset, limit and order by before count

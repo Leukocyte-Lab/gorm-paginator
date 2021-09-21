@@ -1,5 +1,6 @@
 package paginator
 
+// Direction is sort direction when ordering
 type Direction int
 
 const (
@@ -19,12 +20,14 @@ func (enum Direction) String() string {
 	return ""
 }
 
+// page contains page number, page size, and total number of items
 type Page struct {
 	Number int
 	Size   int
 	Total  int
 }
 
+// Order contains sort direction and sort field
 type Order struct {
 	Column    string
 	Direction Direction
