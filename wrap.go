@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// Paging : A easy use wrapper for doing paging
+// Paging is wrapper for doing paging easily
 func (pgntr Paginator) Paging(tx *gorm.DB, dest interface{}) (*Page, error) {
 	result := pgntr.GenGormTransaction(tx).Find(&dest)
 	if result.Error != nil {
