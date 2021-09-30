@@ -8,7 +8,7 @@ import (
 
 // Paging is wrapper for doing paging easily
 func (pgntr Paginator) Paging(tx *gorm.DB, dest interface{}) (*Page, error) {
-	result := pgntr.GenGormTransaction(tx).Find(&dest)
+	result := pgntr.GenGormTransaction(tx).Find(dest)
 	if result.Error != nil {
 		return nil, fmt.Errorf("paginator.paging : %w", result.Error)
 	}
