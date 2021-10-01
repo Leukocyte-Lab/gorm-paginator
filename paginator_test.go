@@ -195,3 +195,57 @@ func TestPaginator_GenGormTransaction(t *testing.T) {
 		})
 	}
 }
+
+func TestPaginator_CountPageTotal(t *testing.T) {
+	type fields struct {
+		Page   Page
+		Order  []Order
+		Filter map[string]string
+	}
+	type args struct {
+		db   *gorm.DB
+		dest interface{}
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		// test case
+		{
+			name: "General",
+			fields: fields{
+				Page: Page{
+					Number: 1,
+					Size:   25,
+				},
+				Order: []Order{
+					{
+						Column:    "id",
+						Direction: SortASC,
+					},
+				},
+			},
+			args: args{
+				db:   setupMockDB("postgres"),
+				dest: &[]tests.User{},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			pgntr := New(
+				tt.fields.Page,
+				tt.fields.Order,
+				tt.fields.Filter,
+			)
+			tx := pgntr.GenGormTransaction(tt.args.db).Find(tt.args.dest)
+
+			if err := pgntr.CountPageTotal(tx); (err != nil) != tt.wantErr {
+				t.Errorf("Paginator.CountPageTotal() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
