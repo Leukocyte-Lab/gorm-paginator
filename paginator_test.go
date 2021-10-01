@@ -44,6 +44,26 @@ func TestPaginator_GenGormTransaction(t *testing.T) {
 			},
 			want: `SELECT * FROM "users" WHERE "users"."deleted_at" IS NULL ORDER BY "id" LIMIT 25`,
 		},
+		{
+			name: "Page2",
+			fields: fields{
+				Page: Page{
+					Number: 2,
+					Size:   25,
+				},
+				Order: []Order{
+					{
+						Column:    "id",
+						Direction: SortASC,
+					},
+				},
+			},
+			args: args{
+				db:   setupMockDB("postgres"),
+				dest: &[]tests.User{},
+			},
+			want: `SELECT * FROM "users" WHERE "users"."deleted_at" IS NULL ORDER BY "id" LIMIT 25 OFFSET 25`,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
