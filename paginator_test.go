@@ -1,11 +1,126 @@
 package paginator
 
 import (
+	"reflect"
 	"testing"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/utils/tests"
 )
+
+func TestPaginator_New(t *testing.T) {
+	type args struct {
+		page   Page
+		orders []Order
+		filter map[string]string
+	}
+	tests := []struct {
+		name string
+		args args
+		want *Paginator
+	}{
+		{
+			name: "General",
+			args: args{
+				page: Page{
+					Number: 1,
+					Size:   25,
+				},
+				orders: []Order{
+					{
+						Column:    "id",
+						Direction: SortASC,
+					},
+				},
+				filter: map[string]string{
+					"id": "excludeID",
+				},
+			},
+			want: &Paginator{
+				Page: Page{
+					Number: 1,
+					Size:   25,
+				},
+				Order: []Order{
+					{
+						Column:    "id",
+						Direction: SortASC,
+					},
+				},
+				Filter: map[string]string{
+					"id": "excludeID",
+				},
+			},
+		},
+		{
+			name: "Nagtive Page",
+			args: args{
+				page: Page{
+					Number: -1,
+					Size:   25,
+				},
+			},
+			want: &Paginator{
+				Page: Page{
+					Number: MinPageNumber,
+					Size:   25,
+				},
+			},
+		},
+		{
+			name: "Zero Page",
+			args: args{
+				page: Page{
+					Number: 0,
+					Size:   25,
+				},
+			},
+			want: &Paginator{
+				Page: Page{
+					Number: MinPageNumber,
+					Size:   25,
+				},
+			},
+		},
+		{
+			name: "Nagtive Page Size",
+			args: args{
+				page: Page{
+					Number: 1,
+					Size:   -1,
+				},
+			},
+			want: &Paginator{
+				Page: Page{
+					Number: 1,
+					Size:   MinPageSize,
+				},
+			},
+		},
+		{
+			name: "Zero Page Size",
+			args: args{
+				page: Page{
+					Number: 1,
+					Size:   0,
+				},
+			},
+			want: &Paginator{
+				Page: Page{
+					Number: 1,
+					Size:   MinPageSize,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := New(tt.args.page, tt.args.orders, tt.args.filter); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("New() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
 
 func TestPaginator_GenGormTransaction(t *testing.T) {
 	type fields struct {
