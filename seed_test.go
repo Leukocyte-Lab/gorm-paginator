@@ -4,18 +4,23 @@ import "gorm.io/gorm/utils/tests"
 
 var mockUsers = []tests.User{
 	{
-		Name: "Jane",
+		Name:   "Jane",
+		Active: false,
 	},
 	{
-		Name: "Jack",
+		Name:   "Jack",
+		Active: true,
 	},
 	{
-		Name: "Jill",
+		Name:   "Jill",
+		Active: true,
 	},
 	{
-		Name: "John",
+		Name:   "John",
+		Active: true,
 	},
 	{
-		Name: "Julia",
+		Name:   "Julia",
+		Active: true,
 	},
 }

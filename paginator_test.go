@@ -356,6 +356,35 @@ func TestPaginator_Paginator(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "Filter Page 2",
+			fields: fields{
+				Page: Page{
+					Number: 2,
+					Size:   2,
+				},
+				Filter: map[string]string{
+					"active": "true",
+				},
+			},
+			args: args{
+				dest: []*tests.User{},
+			},
+			wantPage: Page{
+				Number: 2,
+				Size:   2,
+				Total:  2,
+			},
+			wantDest: []*tests.User{
+				{
+					Name: "John",
+				},
+				{
+					Name: "Julia",
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
