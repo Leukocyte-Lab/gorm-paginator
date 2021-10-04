@@ -64,6 +64,18 @@ func Test_GenPage(t *testing.T) {
 				Total:  0,
 			},
 		},
+		{
+			name: "Nagtive PageNumber",
+			args: args{
+				pageNo:   -1,
+				pageSize: 1,
+			},
+			want: Page{
+				Number: 1,
+				Size:   1,
+				Total:  0,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
