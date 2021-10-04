@@ -53,9 +53,7 @@ func (pgntr *Paginator) CountPageTotal(tx *gorm.DB) error {
 
 	// set PageTotal by counting total page number
 	pgntr.Page.Total = pgntr.countPageTotal(int(recordCount))
-
-	// limit PageNumber <= PageTotal
-	pgntr.limitPageTotal()
+	pgntr.LimitPageTotal()
 
 	return nil
 }
@@ -136,12 +134,19 @@ func (pgntr *Paginator) limitMinPageSize(minPageSize int) {
 	}
 }
 
+func (pgntr *Paginator) LimitPageTotal() {
+	pgntr.limitPageTotal()
+	pgntr.limitPageNumber()
+}
+
 func (pgntr *Paginator) limitPageTotal() {
 	// set page total default to 1
 	if pgntr.Page.Total == 0 {
 		pgntr.Page.Total = 1
 	}
+}
 
+func (pgntr *Paginator) limitPageNumber() {
 	// limit PageNumber <= PageTotal
 	if pgntr.Page.Number > pgntr.Page.Total {
 		pgntr.Page.Number = pgntr.Page.Total
