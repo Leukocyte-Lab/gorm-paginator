@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
 	"gorm.io/gorm/utils/tests"
 )
@@ -248,4 +249,143 @@ func TestPaginator_CountPageTotal(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestPaginator_Paginator(t *testing.T) {
+	resource := setupResource(t)
+	db := setupTestDB(t, resource)
+
+	type fields struct {
+		Page   Page
+		Order  []Order
+		Filter map[string]string
+	}
+	type args struct {
+		dest []*tests.User
+	}
+	tests := []struct {
+		name     string
+		fields   fields
+		args     args
+		wantPage Page
+		wantDest []*tests.User
+		wantErr  bool
+	}{
+		// test case
+		{
+			name: "General",
+			fields: fields{
+				Page: Page{
+					Number: 1,
+					Size:   2,
+				},
+			},
+			args: args{
+				dest: []*tests.User{},
+			},
+			wantPage: Page{
+				Number: 1,
+				Size:   2,
+				Total:  3,
+			},
+			wantDest: []*tests.User{
+				{
+					Name: "Jane",
+				},
+				{
+					Name: "Jack",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Page 2",
+			fields: fields{
+				Page: Page{
+					Number: 2,
+					Size:   2,
+				},
+			},
+			args: args{
+				dest: []*tests.User{},
+			},
+			wantPage: Page{
+				Number: 2,
+				Size:   2,
+				Total:  3,
+			},
+			wantDest: []*tests.User{
+				{
+					Name: "Jill",
+				},
+				{
+					Name: "John",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "DESC Page 2",
+			fields: fields{
+				Page: Page{
+					Number: 2,
+					Size:   2,
+				},
+				Order: []Order{
+					{
+						Column:    "id",
+						Direction: SortDESC,
+					},
+				},
+			},
+			args: args{
+				dest: []*tests.User{},
+			},
+			wantPage: Page{
+				Number: 2,
+				Size:   2,
+				Total:  3,
+			},
+			wantDest: []*tests.User{
+				{
+					Name: "Jill",
+				},
+				{
+					Name: "Jack",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert := assert.New(t)
+
+			pgntr := New(
+				tt.fields.Page,
+				tt.fields.Order,
+				tt.fields.Filter,
+			)
+			tx := pgntr.GenGormTransaction(db).Find(&tt.args.dest)
+			err := pgntr.CountPageTotal(tx)
+			gotDest := tt.args.dest
+			gotPage := pgntr.Page
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Paginator error = %v, wantErr %v", err, tt.wantErr)
+			}
+			if err == nil {
+				assert.NotEmpty(gotPage)
+				assert.Equal(tt.wantPage, gotPage)
+				assert.NotEmpty(gotDest)
+				assert.Len(gotDest, len(tt.wantDest))
+				for index, user := range tt.wantDest {
+					assert.Equal(user.Name, gotDest[index].Name)
+					// TODO: other fileds
+				}
+			}
+		})
+	}
+
+	cleanResource(t, resource)
 }
