@@ -47,9 +47,7 @@ func (pgntr *Paginator) CountPageTotal(tx *gorm.DB) error {
 	tx = pgntr.DelPgntrStmt(tx)
 
 	var recordCount int64
-	if err := tx.Count(&recordCount).Error; err != nil {
-		return err
-	}
+	tx.Count(&recordCount)
 
 	// set PageTotal by counting total page number
 	pgntr.Page.Total = pgntr.countPageTotal(int(recordCount))
