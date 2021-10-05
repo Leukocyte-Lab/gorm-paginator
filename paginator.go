@@ -50,7 +50,7 @@ func (pgntr *Paginator) CountPageTotal(tx *gorm.DB) error {
 	tx.Count(&recordCount)
 
 	// set PageTotal by counting total page number
-	pgntr.Page.Total = pgntr.countPageTotal(int(recordCount))
+	pgntr.Page.Total = pgntr.countPageTotal(recordCount)
 	pgntr.LimitPageTotal()
 
 	return nil
@@ -109,7 +109,7 @@ func (pgntr Paginator) rmOrderBy(tx *gorm.DB) *gorm.DB {
 	return tx
 }
 
-func (pgntr Paginator) countPageTotal(recordCount int) (pageTotal int) {
+func (pgntr Paginator) countPageTotal(recordCount int64) (pageTotal int) {
 	// page total start with 1
 	if recordCount == 0 || pgntr.Page.Size == 0 {
 		return 1
